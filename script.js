@@ -1,1 +1,57 @@
+function addTask() {
+  const input = document.getElementById('taskInput');
+  const task = input.value.trim();
+  if (task === '') return;
 
+  const li = document.createElement('li');
+  li.textContent = task;
+
+  // Mark complete on click
+  li.onclick = () => {
+    li.classList.toggle('completed');
+    saveTasks();
+  };
+
+  // Right-click to delete
+  li.oncontextmenu = (e) => {
+    e.preventDefault();
+    li.remove();
+    saveTasks();
+  };
+
+  document.getElementById('taskList').appendChild(li);
+  input.value = '';
+  saveTasks();
+}
+
+function saveTasks() {
+  const tasks = Array.from(document.querySelectorAll('#taskList li')).map(li => ({
+    text: li.textContent,
+    completed: li.classList.contains('completed')
+  }));
+  localStorage.setItem('tasks', JSON.stringify(tasks));
+}
+
+function loadTasks() {
+  const saved = JSON.parse(localStorage.getItem('tasks')) || [];
+  saved.forEach(task => {
+    const li = document.createElement('li');
+    li.textContent = task.text;
+    if (task.completed) li.classList.add('completed');
+
+    li.onclick = () => {
+      li.classList.toggle('completed');
+      saveTasks();
+    };
+
+    li.oncontextmenu = (e) => {
+      e.preventDefault();
+      li.remove();
+      saveTasks();
+    };
+
+    document.getElementById('taskList').appendChild(li);
+  });
+}
+
+window.onload = loadTasks;
